@@ -1,25 +1,26 @@
 import * as vsc from 'vscode';
 import * as gbs from './globals'
 
-import sharp from 'sharp';
+import * as pngjs from 'pngjs'; 
+import * as jpeg from 'jpeg-js'
 
 export interface rgba {
-  r?: number,
-  g?: number,
-  b?: number,
+  r: number,
+  g: number,
+  b: number,
   a?: number
 }
 
 export class PreparedImgData {
   public w: number;
   public h: number;
-  public c: number;
+  public ext: string;
   public raw?: Uint8ClampedArray;
 
-  public constructor(w: number, h: number, c: number) {
+  public constructor(ext: string, w: number, h: number) {
     this.w = w;
     this.h = h;
-    this.c = c;
+    this.ext = ext;
   }
 
   public addRaw(buf: Buffer): PreparedImgData {
@@ -28,50 +29,55 @@ export class PreparedImgData {
   }
 
   public pixel(x: number, y: number): rgba | null {
-    if (!this.raw) return null;
-    const ix = (this.w*y+x)*this.c
+    if (!this.raw || y < 0 || x < 0 || x > this.w || y > this.h) return null;
+    var ix: number;
 
-    switch (this.c) {
-      case 1:
-        return {
-          g: this.raw[ix]
-        };
-      case 2:
-        return {
-          g: this.raw[ix],
-          a: this.raw[ix+1]
-        };
-      case 3:
-        return {
-          r: this.raw[ix],
-          g: this.raw[ix+1],
-          b: this.raw[ix+2]
-        }
-      case 4:
-        return {
-          r: this.raw[ix],
-          g: this.raw[ix+1],
-          b: this.raw[ix+2],
-          a: this.raw[ix+3]
-        }
-      default:
-        return null;
+    switch (this.ext) {
+      case 'png':
+        ix = (this.w * y + x) << 2;
+      break;
+      case 'jpeg':
+      case 'jpg':
+        ix = (this.w * y + x) * 4;
+      break;
+      default: throw "Unsupported on post stage... wtf?";
     }
+
+    return {
+      r: this.raw[ix],
+      g: this.raw[ix + 1],
+      b: this.raw[ix + 2],
+      a: this.raw[ix + 3]
+    };
   }
 }
 
 async function parseImage(file_path: vsc.Uri) : Promise<PreparedImgData> {
     const content = await vsc.workspace.fs.readFile(file_path);
-
-    const img_data = await sharp(content).raw().toBuffer({ resolveWithObject: true });
+    const fpth_split = file_path.path.split(".");
+    const ftype = fpth_split[fpth_split.length-1].toLowerCase();
     
-    const img = new PreparedImgData(
-        img_data.info.width, 
-        img_data.info.height, 
-        img_data.info.channels)
-      .addRaw(img_data.data);
+    var pic: PreparedImgData;
 
-    return img;
+    switch (ftype) {
+      case 'png':
+      {
+        const data = pngjs.PNG.sync.read(Buffer.from(content));
+        pic = new PreparedImgData(ftype, data.width, data.height).addRaw(data.data);
+      }
+      break;
+      case 'jpeg':
+      case 'jpg':
+      {
+        const data = jpeg.decode(Buffer.from(content));
+        pic = new PreparedImgData(ftype, data.width, data.height).addRaw(data.data);
+      }
+      break;
+      default: throw "Not supported"
+    }
+  
+
+    return pic;
 }
 
 export async function commandHandler() {
@@ -81,7 +87,7 @@ export async function commandHandler() {
     const selector = await vsc.window.showOpenDialog({
         title: "Choose picture to upload",
         filters: {
-            "Image": ["png", "bmp", "jpg", "jpeg"]
+            "Image": ["png", "jpg", "jpeg"]
         },
         canSelectFiles: true,
         canSelectFolders: false,
@@ -95,5 +101,7 @@ export async function commandHandler() {
 
     if (gbs.isDebug()) gbs.debugMessage(`[DEBUG] Got file path: "${selector[0].path}".`);
 
-    const imgData = await parseImage(vsc.Uri.file(selector[0].path));
+    // Test of parser
+    // const imgData = await parseImage(vsc.Uri.file(selector[0].path));
+    // vsc.window.showInformationMessage(`PX: ${imgData.pixel(100, 100)?.g}`);
 }

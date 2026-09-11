@@ -7,4 +7,4 @@ mkdir build
 
 npm install
 npm run compile
-vsce package --allow-star-activation
+vsce package --allow-star-activation --readme-path src/README.md
