@@ -1,0 +1,57 @@
+{
+  "name": "dectox",
+  "displayName": "DecTox",
+  "description": "VS code: code decoration",
+  "version": "0.0.1",
+  "repository": "https://github.com/LeastDepressedDev/dectox",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./build/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "title": "Place picture",
+        "command": "dectox.PlacePic"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "General",
+        "properties": {
+          "dectox.Debug": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enforces debug output N prints."
+          }
+        }
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "dectox.PlacePic",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "sharp": "^0.35.4"
+  }
+}
