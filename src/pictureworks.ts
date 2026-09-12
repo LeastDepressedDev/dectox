@@ -26,8 +26,8 @@ export class PreparedImgData {
     return this;
   }
 
-  public pixel(x: number, y: number): rgba | null {
-    if (!this.raw || y < 0 || x < 0 || x > this.w || y > this.h) return null;
+  public index(x: number, y: number): number | null {
+    if (y < 0 || x < 0 || x > this.w || y > this.h) return null;
     var ix: number;
 
     switch (this.ext) {
@@ -40,6 +40,12 @@ export class PreparedImgData {
       break;
       default: throw "Unsupported on post stage... wtf?";
     }
+    return ix;
+  }
+
+  public pixel(x: number, y: number): rgba | null {
+    const ix = this.index(x, y);
+    if (!ix || !this.raw) return null;
 
     return {
       r: this.raw[ix],
@@ -50,7 +56,7 @@ export class PreparedImgData {
   }
 }
 
-async function parseImage(file_path: vsc.Uri) : Promise<PreparedImgData> {
+export async function parseImage(file_path: vsc.Uri) : Promise<PreparedImgData> {
     const content = await vsc.workspace.fs.readFile(file_path);
     const fpth_split = file_path.path.split(".");
     const ftype = fpth_split[fpth_split.length-1].toLowerCase();

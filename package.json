@@ -21,6 +21,10 @@
       {
         "title": "Place picture",
         "command": "dectox.PlacePic"
+      },
+      {
+        "title": "Test ascii conv",
+        "command": "dectox.TestAscii"
       }
     ],
     "configuration": [
@@ -31,6 +35,17 @@
             "type": "boolean",
             "default": false,
             "description": "Enforces debug output N prints."
+          }
+        }
+      },
+      {
+        "title": "ASCII Picturing",
+        "properties": {
+          "dectox.DepthMethod": {
+            "type": "string",
+            "description": "Selects depth method",
+            "enum": ["default(Vec3^2 method)"],
+            "default": "default(Vec3^2 method)"
           }
         }
       }
