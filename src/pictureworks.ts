@@ -10,10 +10,10 @@ export interface rgba {
 }
 
 export class PreparedImgData {
-  public w: number;
-  public h: number;
-  public bpp: number;
-  public raw: Buffer;
+  public readonly w: number;
+  public readonly h: number;
+  public readonly bpp: number;
+  public readonly raw: Buffer;
 
   public constructor(w: number, h: number, bpp: number, raw: Buffer) {
     this.w = w;
