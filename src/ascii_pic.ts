@@ -21,7 +21,7 @@ export async function commandHandler() {
     const selector = await vsc.window.showOpenDialog({
         title: "Choose picture to upload",
         filters: {
-            "Image": ["png", "jpg", "jpeg"]
+            "Image": ["bmp"]
         },
         canSelectFiles: true,
         canSelectFolders: false,
@@ -37,66 +37,61 @@ export async function commandHandler() {
 
     // Test of parser
     const imgData = await pictureworks.parseImage(vsc.Uri.file(selector[0].path));
-    vsc.window.showInformationMessage(`PX: ${imgData.pixel(100, 100)?.g}`);
+    const config = gbs.configs();
+    if (!config) throw "Config is null";
+    let tw = config.get<number>("PicWidth");
+    let th = config.get<number>("PicHeight");
+    if (!tw || !th) throw "Config part is null";
+
+    const blockW = imgData.w/tw;
+    const blockH = imgData.h/th;
+
+    let mn = Infinity;
+    let mx = 0;
+    for (let y = 0; y < th; y++) {
+      for (let x = 0; x < tw; x++) {
+        var pxl = imgData.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
+        if (!pxl) continue;
+        const depth = calcDepth(pxl);
+        mx = Math.max(mx, depth);
+        mn = Math.min(mn, depth);
+      }
+    }
+
+    let strBuild: string = "";
+    for (let y = 0; y < th; y++) {
+      for (let x = 0; x < tw; x++) {
+        var pxl = imgData.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
+        if (!pxl) pxl = {r: 0, g: 0, b: 0, a: 0};
+        const depth = calcDepth(pxl);
+        strBuild += signFromDepth(mn, mx, depth);
+      }
+      strBuild+="\n";
+    }
+
+    const editor = vsc.window.activeTextEditor;
+    if (!editor) throw "Attempted to write in non existant editor."
+    editor.edit((qui) => {
+      qui.insert(editor.selection.active, "//"+strBuild.replaceAll("\n", "\n//"));
+    });
 }
 
-export const DEF_SYB = "@$#%&*+=~-:,. " ;
+
+export function asciiOrder(): string {
+  const config = gbs.configs()?.get<string>("ASCIILayers");
+  if (!config) throw "Null ascii config error";
+  switch(config) {
+    case '10': return "@%#*+=-:. ";
+    case '13': return "@#%&*+=~-:,. ";
+    default:
+    case '14': return "@$#%&*+=~-:,. ";
+    case '20': return "@%#W&8oahkbdpqwmZO0Q";
+    case '70': return "@%#WMB&8$oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+    case '71': return "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+  }
+}
+
 export function signFromDepth(min: number, max: number, depth: number): string {
-  return DEF_SYB[Math.floor((depth-min)/(max-min)*(DEF_SYB.length-1))];
-}
-
-export async function test(path: vsc.Uri) {
-  vsc.window.showInformationMessage("Testing img");
-  const trans = await pictureworks.parseImage(path);
-
-  const config = gbs.configs();
-  if (!config) throw "Config is null";
-  let tw = config.get<number>("PicWidth");
-  let th = config.get<number>("PicHeight");
-  if (!tw || !th) throw "Config part is null";
-
-  const blockW = trans.w/tw;
-  const blockH = trans.h/th;
-
-  vsc.window.showInformationMessage(`${trans.bpp} ${trans.w} ${trans.h} ${blockW} ${blockH}`);
- 
-  let mn = Infinity;
-  let mx = 0;
-  for (let y = 0; y < th; y++) {
-    for (let x = 0; x < tw; x++) {
-      var pxl = trans.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
-      if (!pxl) pxl = {r: 0, g: 0, b: 0, a: 0};
-      const depth = calcDepth(pxl);
-      mx = Math.max(mx, depth);
-      mn = Math.min(mn, depth);
-    }
-  }
-
-  let strBuild: string = "";
-  for (let y = 0; y < th; y++) {
-    for (let x = 0; x < tw; x++) {
-      var pxl = trans.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
-      if (!pxl) pxl = {r: 0, g: 0, b: 0, a: 0};
-      const depth = calcDepth(pxl);
-      strBuild += signFromDepth(mn, mx, depth);
-    }
-    strBuild+="\n";
-  }
-
-  console.log(strBuild);
-
-  // let mid = 0;
-  // let mn = Infinity;
-  // let mx = 0;
-  // for (let i = 0; i < trans._depthArray.length; i++) {
-  //   let depth = trans._depthArray[i];
-  //   mid += depth;
-  //   mx = Math.max(mx, depth);
-  //   mn = Math.min(mn, depth);
-  // }
-  // mid /= trans._depthArray.length;
-
-  // vsc.window.showInformationMessage(`${mn} ${mx}: ${mid}`);
-
-
+  const order = asciiOrder();
+  return order[Math.floor((depth-min)/(max-min)*(order.length-1))];
 }
