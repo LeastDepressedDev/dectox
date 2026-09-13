@@ -21,6 +21,10 @@
       {
         "title": "Place picture",
         "command": "dectox.PlacePic"
+      },
+      {
+        "title": "Enforce smart tab",
+        "command": "dectox.smartTab"
       }
     ],
     "configuration": [
@@ -80,6 +84,12 @@
         "command": "dectox.PlacePic",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "dectox.smartTab",
+        "key": "shift+right",
+        "mac": "cmd+right",
         "when": "editorTextFocus"
       }
     ]
