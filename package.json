@@ -21,6 +21,10 @@
       {
         "title": "Place picture",
         "command": "dectox.PlacePic"
+      },
+      {
+        "title": "General Dectox Test",
+        "command": "dectox.Test"
       }
     ],
     "configuration": [
@@ -82,7 +86,29 @@
         "mac": "cmd+shift+l",
         "when": "editorTextFocus"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dectoxBar",
+          "title": "DecTox",
+          "icon": "build/assets/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "dectoxBar": [
+        {
+          "id": "dectoxOptions",
+          "name": "Options",
+          "type": "webview",
+          "icon": ""
+        }
+      ]
+    },
+    "menus": {
+      
+    }
   },
   "scripts": {
     "compile": "tsc -p ./"
