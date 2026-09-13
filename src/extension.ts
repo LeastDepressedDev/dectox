@@ -6,7 +6,7 @@ export function activate(context: vsc.ExtensionContext) {
     if (gbs.isDebug()) gbs.debugMessage("[DEBUG] dectox It is started!!!");
 
     vsc.commands.registerCommand("dectox.PlacePic", asciiPicHandler); // Ascii picture handler proc
-    vsc.commands.registerCommand("dectox.TestAscii", () => {test(vsc.Uri.file("/home/sirtage/all/isop/dectox/wbs.png"));});
+    vsc.commands.registerCommand("dectox.TestAscii", () => {test(vsc.Uri.file("/home/ldd/all/docs/rpo/lab_ide_3/dectox/images.bmp"));});
 }
 
 export function deactivate() {

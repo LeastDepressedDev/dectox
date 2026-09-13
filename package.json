@@ -44,8 +44,23 @@
           "dectox.DepthMethod": {
             "type": "string",
             "description": "Selects depth method",
-            "enum": ["default(Vec3^2 method)"],
-            "default": "default(Vec3^2 method)"
+            "enum": [
+              "rgb/3",
+              "Vec3^2 method"
+            ],
+            "default": "rgb/3"
+          },
+          "dectox.PicWidth": {
+            "type": "integer",
+            "description": "Width of ascii picture",
+            "minimum": 0,
+            "default": 50
+          },
+          "dectox.PicHeight": {
+            "type": "integer",
+            "description": "Height of ascii picture",
+            "minimum": 0,
+            "default": 30
           }
         }
       }
@@ -65,12 +80,10 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
-    "@types/pngjs": "^6.0.5",
     "@types/vscode": "^1.90.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "jpeg-js": "^0.4.4",
-    "pngjs": "^7.0.0"
+    "bmp-ts": "^1.0.9"
   }
 }
