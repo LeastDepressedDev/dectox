@@ -4,7 +4,7 @@
   "description": "VS code: code decoration",
   "publisher": "LeastDepressedDev",
   "author": "LeastDepressedDev",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/LeastDepressedDev/dectox",
   "engines": {
     "vscode": "^1.90.0"
