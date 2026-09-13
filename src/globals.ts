@@ -14,8 +14,6 @@ export function throwLocalException(exception: LocalException) {
     throw exception;
 }
 
-
-
 export function configs(): vsc.WorkspaceConfiguration | null {
     if (emg_cutoff) return null;
     const val = vsc.workspace.getConfiguration("dectox");
