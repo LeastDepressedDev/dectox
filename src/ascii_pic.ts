@@ -72,10 +72,9 @@ export async function commandHandler() {
     const editor = vsc.window.activeTextEditor;
     if (!editor) throw "Attempted to write in non existant editor."
     editor.edit((qui) => {
-      qui.insert(editor.selection.active, "//"+strBuild.replaceAll("\n", "\n//"));
+      qui.insert(editor.selection.active, getCommentSign()+strBuild.replaceAll("\n", `\n${getCommentSign()}`));
     });
 }
-
 
 export function asciiOrder(): string {
   const config = gbs.configs()?.get<string>("ASCIILayers");
@@ -90,6 +89,33 @@ export function asciiOrder(): string {
     case '71': return "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
   }
 }
+
+export function getCommentSign(): string|null {
+  //TODO: Make it supproted for more languages or auto detect comment sign
+  const editor = vsc.window.activeTextEditor;
+  if (!editor) return null;
+  let sign = '';
+  if (!gbs.configs()?.get<boolean>("DisableCommentSigns")) {
+    switch (editor.document.languageId) {
+      case 'plain':
+        sign = '';
+        break;
+      case 'lua':
+        sign = '--';
+        break;
+      case "shellscript":
+      case "python":
+        sign = '#';
+        break;
+      default:
+        sign = "//";
+        break;
+    }
+    if (gbs.isDebug()) console.log(`[DECTOX DEBUG] Comment sign for recent operation: ${editor.document.languageId}(${sign})`);
+  }
+  return sign;
+}
+
 
 export function signFromDepth(min: number, max: number, depth: number): string {
   const order = asciiOrder();

@@ -75,6 +75,11 @@
             "description": "Height of ascii picture.",
             "minimum": 0,
             "default": 30
+          },
+          "dectox.DisableCommentSigns": {
+            "type": "boolean",
+            "description": "Removes comment sign on start of each line for all file extensions.",
+            "default": false
           }
         }
       }
