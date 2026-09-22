@@ -25,6 +25,10 @@
       {
         "title": "Enforce smart tab",
         "command": "dectox.smartTab"
+      },
+      {
+        "title": "Pinterest test command",
+        "command": "decctox.pintest"
       }
     ],
     "configuration": [

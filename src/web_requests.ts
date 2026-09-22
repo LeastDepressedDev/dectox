@@ -16,6 +16,7 @@ export async function activate() {
     });
 
     console.log(await browser.version());
+    pages = new Map();
     available = true;
 }
 
