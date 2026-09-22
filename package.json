@@ -80,6 +80,11 @@
             "type": "boolean",
             "description": "Removes comment sign on start of each line for all file extensions.",
             "default": false
+          },
+          "dectox.BrowserPath": {
+            "type": "string",
+            "description": "Path or command to the active browser",
+            "default": "firefox"
           }
         }
       }
@@ -106,9 +111,11 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
     "@types/vscode": "^1.90.0",
+    "puppeteer": "^25.11.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "bmp-ts": "^1.0.9"
+    "bmp-ts": "^1.0.9",
+    "puppeteer-core": "^25.11.0"
   }
 }
