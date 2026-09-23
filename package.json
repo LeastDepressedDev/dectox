@@ -27,6 +27,10 @@
         "command": "dectox.smartTab"
       },
       {
+        "title": "Get Picture suggestions",
+        "command": "dectox.grabpics"
+      },
+      {
         "title": "Pinterest test command",
         "command": "decctox.pintest"
       }
@@ -96,6 +100,11 @@
             "minimum": 100,
             "maximum": 2000,
             "default": 500
+          },
+          "dectox.ShouldClearBufp": {
+            "type": "boolean",
+            "description": "Should clear bufp directories from all files when calling Suggestion commands",
+            "default": true
           }
         }
       }

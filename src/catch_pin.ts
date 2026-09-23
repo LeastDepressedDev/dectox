@@ -16,14 +16,53 @@ const window = { scrollBy: function(x: number, y: number){}};
 //
 //
 
-export async function getPictures(query: string) {
+
+
+export var bufpDir: [string, vsc.FileType][];
+
+export function getBufpPath(): vsc.Uri {
     const defp = gbs.getExtLocalStorageUri();
+    if (!defp) throw "Storage path is null!";
+    return vsc.Uri.joinPath(defp, "bufp");
+}
+
+export async function updatePicturesDirectory() {
+    const path = getBufpPath();
+
+    const dir = await vsc.workspace.fs.readDirectory(path);
+    bufpDir = dir;
+    gbs.debugMessage(`Updated bufpDir: ${bufpDir.length-1} files in there.`);
+}
+
+export async function commandHandler() {
+    let result = await vsc.window.showInputBox({
+        prompt: "Pinterest query to search",
+        placeHolder: "Anything you like"
+    });
+
+    vsc.window.withProgress({
+        location: vsc.ProgressLocation.Notification,
+        title: `Request${result ? '('+result+')' : ''} in progress...`,
+        cancellable: true
+    }, async (prog, tkn) => {
+        await getPictures(result ? result : " ");
+        await gbs.sleep(1000); // TODO: Make a proper request finished check
+        await updatePicturesDirectory();
+    });   
+}
+
+export async function getPictures(query: string) {
     const cfg = gbs.configs();
     if (!cfg) throw "Configs are null!";
-    if (!defp) throw "Storage path is null!";
-    const path = vsc.Uri.joinPath(defp, "bufp");
+    const path = getBufpPath();
     try {
         await vsc.workspace.fs.stat(path);
+        if (cfg.get<boolean>("ShouldClearBufp")) {
+            await vsc.workspace.fs.delete(path, {
+                recursive: true
+            });
+            await vsc.workspace.fs.createDirectory(path);
+        }
     } catch {
         gbs.debugMessage("bufp directory not found... Creating new one");
         await vsc.workspace.fs.createDirectory(path);
@@ -44,7 +83,7 @@ export async function getPictures(query: string) {
         const result = (await page.$$eval(".iFOUS5", els => {
             return els.map(element => element.src);
         })).filter((element) => !pattern.exec(element));
-        console.log(`Iteration: ${i}: Got ${result.length} pics.`);
+        if (gbs.isDebug()) console.log(`Iteration: ${i}: Got ${result.length} pics.`);
 
         result.forEach((img) => imagination.add(img));
 
@@ -55,17 +94,17 @@ export async function getPictures(query: string) {
         await gbs.sleep(del);
     }
 
-    console.log(imagination.size);
+    if (gbs.isDebug()) console.log(imagination.size);
 
     let i = 0;
     imagination.forEach(img => {
         fetch(img).then((response) => {
             response.arrayBuffer().then(buf => {
-                console.log(buf.byteLength);
                 vsc.workspace.fs.writeFile(vsc.Uri.joinPath(path, `${i++}.jpg`), new Uint8Array(buf));
             });
         })
     });
 
     await wqr.closeTab(stabf(uuid));
+    vsc.window.showInformationMessage(`Got ${imagination.size} pictures from pinterest.`);
 }
