@@ -87,8 +87,15 @@
           },
           "dectox.BrowserPath": {
             "type": "string",
-            "description": "Path or command to the active browser",
+            "description": "Path or command to the active browser.",
             "default": "firefox"
+          },
+          "dectox.RequestDelay": {
+            "type":"integer",
+            "description": "Delay between repeating web request.",
+            "minimum": 100,
+            "maximum": 2000,
+            "default": 500
           }
         }
       }

@@ -18,6 +18,8 @@ const window = { scrollBy: function(x: number, y: number){}};
 
 export async function getPictures(query: string) {
     const defp = gbs.getExtLocalStorageUri();
+    const cfg = gbs.configs();
+    if (!cfg) throw "Configs are null!";
     if (!defp) throw "Storage path is null!";
     const path = vsc.Uri.joinPath(defp, "bufp");
     try {
@@ -27,6 +29,8 @@ export async function getPictures(query: string) {
         await vsc.workspace.fs.createDirectory(path);
     }
 
+    const del = cfg.get<number>("RequestDelay");
+    if (!del) throw "Failed to get RequestDelat config";
     const uuid = randomUUID();
     const page = await wqr.initTab(stabf(uuid));
     
@@ -45,10 +49,10 @@ export async function getPictures(query: string) {
         result.forEach((img) => imagination.add(img));
 
         await page.evaluate(() => {
-            window.scrollBy(0, 200);
+            window.scrollBy(0, 500);
         });
 
-        await gbs.sleep(200);
+        await gbs.sleep(del);
     }
 
     console.log(imagination.size);
