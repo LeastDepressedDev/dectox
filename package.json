@@ -99,7 +99,7 @@
             "default": "firefox"
           },
           "dectox.RequestDelay": {
-            "type":"integer",
+            "type": "integer",
             "description": "Delay between repeating web request.",
             "minimum": 100,
             "maximum": 2000,
@@ -144,7 +144,8 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "bmp-ts": "^1.0.9",
-    "puppeteer-core": "^25.11.0"
+    "jpeg-js": "^0.4.4",
+    "puppeteer-core": "^25.11.0",
+    "safi-image": "^0.1.0"
   }
 }
