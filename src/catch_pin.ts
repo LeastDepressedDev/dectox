@@ -2,6 +2,7 @@ import * as wqr from './web_requests';
 import * as gbs from './globals';
 import * as vsc from 'vscode';
 import { randomUUID } from 'crypto';
+import { INSTANCE as bufpInstance } from './views/view_bufp';
 
 function stabf(uuid: string): string {
     return `${uuid}-picture-grab`;
@@ -36,6 +37,7 @@ export async function updatePicturesDirectory() {
 
     const dir = await vsc.workspace.fs.readDirectory(path);
     bufpDir = dir;
+    if (bufpInstance) bufpInstance.refresh();
     gbs.debugMessage(`Updated bufpDir: ${bufpDir.length-1} files in there.`);
 }
 
