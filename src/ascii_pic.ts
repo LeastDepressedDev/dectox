@@ -21,7 +21,7 @@ export async function commandHandler() {
     const selector = await vsc.window.showOpenDialog({
         title: "Choose picture to upload",
         filters: {
-            "Image": ["bmp"]
+            "Image": ["bmp", "jpg", "png", "jpeg"]
         },
         canSelectFiles: true,
         canSelectFolders: false,

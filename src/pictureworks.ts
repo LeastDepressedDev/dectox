@@ -38,11 +38,17 @@ export class PreparedImgData {
 
 export async function parseImage(file_path: vsc.Uri) : Promise<PreparedImgData> {
     const safi = await import("safi-image"); // Dynamic import because of JavaScript bieng dorky again
+    const jpeg = await import("jpeg-js");
 
     const content = await vsc.workspace.fs.readFile(file_path);
     const fpth_split = file_path.path.split(".");
     const ftype = fpth_split[fpth_split.length-1].toLowerCase();
 
-    const img = await safi.decode(content);
-    return new PreparedImgData(img.width, img.height, img.data);
+    if (ftype == "jpg" || ftype == "jpeg") { // While main library does not support progressives
+      const img = await jpeg.decode(content);
+      return new PreparedImgData(img.width, img.height, new Uint8ClampedArray(img.data));
+    } else {
+      const img = await safi.decode(content);
+      return new PreparedImgData(img.width, img.height, img.data);
+    }
 }
