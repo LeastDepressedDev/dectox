@@ -3,6 +3,12 @@ import * as gbs from './globals'
 
 import * as pictureworks from './pictureworks'
 
+/**
+ * Calculates `depth` for the given color in {@link pictureworks.rgba} format.
+ * 
+ * @param col Pixel's color.
+ * @returns depth (Grayscale value).
+ */
 export function calcDepth(col: pictureworks.rgba): number {
   const _method = gbs.configs()?.get<string>("DepthMethod");
   switch (_method) {
@@ -14,6 +20,11 @@ export function calcDepth(col: pictureworks.rgba): number {
   }
 }
 
+/**
+ * Emplaces picture into the active editor.
+ * 
+ * @param path Uri of the image
+ */
 export async function placePicture(path: vsc.Uri) {
   const imgData = await pictureworks.parseImage(path);
   const config = gbs.configs();
@@ -55,6 +66,9 @@ export async function placePicture(path: vsc.Uri) {
   });
 }
 
+/**
+ * Handles *Choose picture to place* command.
+ */
 export async function commandHandler() {
     if (gbs.emg_cutoff) {
         gbs.msgCutoff(); return;
@@ -79,6 +93,11 @@ export async function commandHandler() {
     await placePicture(vsc.Uri.file(selector[0].path));
 }
 
+/**
+ * Obtain ASCII string which to be used for image conversion. Uses `dectox.ASCIILayers` setting to determine which to use.
+ * 
+ * @returns ascii order string.
+ */
 export function asciiOrder(): string {
   const config = gbs.configs()?.get<string>("ASCIILayers");
   if (!config) throw "Null ascii config error";
@@ -93,6 +112,11 @@ export function asciiOrder(): string {
   }
 }
 
+/**
+ * Obtain symbols responsible for commenting code relative to the opened files language id.
+ * 
+ * @returns sign(s) string. If there is no active editor return `null`.
+ */
 export function getCommentSign(): string|null {
   //TODO: Make it supproted for more languages or auto detect comment sign
   const editor = vsc.window.activeTextEditor;
@@ -119,7 +143,14 @@ export function getCommentSign(): string|null {
   return sign;
 }
 
-
+/**
+ * Obtain an ascii symbol for the specific color.
+ * 
+ * @param min minimal depth over the image.
+ * @param max maximal depth over the image.
+ * @param depth current color's depth calculated via {@link calcDepth}.
+ * @returns ascii symbol from {@link asciiOrder} created order string.
+ */
 export function signFromDepth(min: number, max: number, depth: number): string {
   const order = asciiOrder();
   return order[Math.floor((depth-min)/(max-min)*(order.length-1))];

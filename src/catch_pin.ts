@@ -4,6 +4,12 @@ import * as vsc from 'vscode';
 import { randomUUID } from 'crypto';
 import { INSTANCE as bufpInstance } from './views/view_bufp';
 
+/**
+ * Local macros for picture grab tab id generation.
+ * 
+ * @param uuid unique id of the newly(to be) generated tab.
+ * @returns final id.
+ */
 function stabf(uuid: string): string {
     return `${uuid}-picture-grab`;
 }
@@ -11,6 +17,9 @@ function stabf(uuid: string): string {
 //
 // Giga Kostil javascript moment!!!
 //
+/**
+ * @deprecated DO NOT USE THIS NOR REMOVE. It is an important thing that shuts off typescript compiler error.
+ */
 const window = { scrollBy: function(x: number, y: number){}};
 
 //
@@ -18,20 +27,33 @@ const window = { scrollBy: function(x: number, y: number){}};
 //
 
 
-
+/**
+ * List of files located in the image buffer directory.
+ */
 export var bufpDir: [string, vsc.FileType][];
 
+/**
+ * Macros for obtaining image buffer directory.
+ * 
+ * @returns uri to the directory/folder.
+ */
 export function getBufpPath(): vsc.Uri {
     const defp = gbs.getExtLocalStorageUri();
     if (!defp) throw "Storage path is null!";
     return vsc.Uri.joinPath(defp, "bufp");
 }
 
+/**
+ * Tries to open image buffer folder in systems registered explorer. 
+ */
 export async function revealBufp() {
     const path = getBufpPath();
     await vsc.commands.executeCommand('revealFileInOS', path);
 }
 
+/**
+ * Scans image buffer page and updates {@link bufpDir}.
+ */
 export async function updatePicturesDirectory() {
     const path = getBufpPath();
 
@@ -41,6 +63,9 @@ export async function updatePicturesDirectory() {
     gbs.debugMessage(`Updated bufpDir: ${bufpDir.length-1} files in there.`);
 }
 
+/**
+ * Handles user web request.
+ */
 export async function commandHandler() {
     let result = await vsc.window.showInputBox({
         prompt: "Pinterest query to search",
@@ -58,6 +83,14 @@ export async function commandHandler() {
     });   
 }
 
+/**
+ * Requests pinterest page and get images from it.
+ * 
+ * Will be properly documented later. (Or not, who knows)
+ * 
+ * @param query User pinterest query.
+ * @param prog Optional {@link vsc.Progress} if called as task by {@link vsc.window.withProgress}.
+ */
 export async function getPictures(query: string, prog?: vsc.Progress<{
     message?: string;
     increment?: number;

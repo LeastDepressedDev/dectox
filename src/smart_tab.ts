@@ -1,6 +1,8 @@
 import * as vsc from 'vscode';
 
-
+/**
+ * Handler for smart tab command.
+ */
 export async function commandHandler() {
     const editor = vsc.window.activeTextEditor;
     if (!editor || !editor.selection) return;
