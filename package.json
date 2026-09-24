@@ -25,6 +25,18 @@
       {
         "title": "Enforce smart tab",
         "command": "dectox.smartTab"
+      },
+      {
+        "title": "Get Picture suggestions",
+        "command": "dectox.grabpics"
+      },
+      {
+        "title": "Open Image buffer directory",
+        "command": "dectox.reavealBufp"
+      },
+      {
+        "title": "Pinterest test command",
+        "command": "decctox.pintest"
       }
     ],
     "configuration": [
@@ -80,6 +92,28 @@
             "type": "boolean",
             "description": "Removes comment sign on start of each line for all file extensions.",
             "default": false
+          },
+          "dectox.BrowserPath": {
+            "type": "string",
+            "description": "Path or command to the active browser.",
+            "default": "firefox"
+          },
+          "dectox.RequestDelay": {
+            "type":"integer",
+            "description": "Delay between repeating web request.",
+            "minimum": 100,
+            "maximum": 2000,
+            "default": 500
+          },
+          "dectox.ShouldClearBufp": {
+            "type": "boolean",
+            "description": "Should clear bufp directories from all files when calling Suggestion commands",
+            "default": true
+          },
+          "dectox.OpenBufpFolderAfterRequest": {
+            "type": "boolean",
+            "description": "Automatically executes revealFileInOS(open in Explorer) folder after Suggestion request",
+            "default": false
           }
         }
       }
@@ -106,9 +140,11 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
     "@types/vscode": "^1.90.0",
+    "puppeteer": "^25.11.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "bmp-ts": "^1.0.9"
+    "bmp-ts": "^1.0.9",
+    "puppeteer-core": "^25.11.0"
   }
 }

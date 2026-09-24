@@ -14,6 +14,20 @@ export function throwLocalException(exception: LocalException) {
     throw exception;
 }
 
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+export var context: vsc.ExtensionContext;
+export function setContext(ctx: vsc.ExtensionContext) {
+    context = ctx;
+}
+
+export function getExtLocalStorageUri(): vsc.Uri | undefined {
+    return context.globalStorageUri;
+}
+
 export function configs(): vsc.WorkspaceConfiguration | null {
     if (emg_cutoff) return null;
     const val = vsc.workspace.getConfiguration("dectox");
