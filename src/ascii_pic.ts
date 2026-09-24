@@ -14,6 +14,47 @@ export function calcDepth(col: pictureworks.rgba): number {
   }
 }
 
+export async function placePicture(path: vsc.Uri) {
+  const imgData = await pictureworks.parseImage(path);
+  const config = gbs.configs();
+  if (!config) throw "Config is null";
+
+  let tw = config.get<number>("PicWidth");
+  let th = config.get<number>("PicHeight");
+  if (!tw || !th) throw "Config part is null";
+
+  const blockW = imgData.w/tw;
+  const blockH = imgData.h/th;
+  let mn = Infinity;
+  let mx = 0;
+
+  for (let y = 0; y < th; y++) {
+    for (let x = 0; x < tw; x++) {
+      var pxl = imgData.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
+      if (!pxl) continue;
+      const depth = calcDepth(pxl);
+      mx = Math.max(mx, depth);
+      mn = Math.min(mn, depth);
+    }
+  }
+
+  let strBuild: string = "";
+  for (let y = 0; y < th; y++) {
+    for (let x = 0; x < tw; x++) {
+      var pxl = imgData.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
+      if (!pxl) pxl = {r: 0, g: 0, b: 0, a: 0};
+      const depth = calcDepth(pxl);
+      strBuild += signFromDepth(mn, mx, depth);
+    }
+    strBuild+="\n";
+  }
+  const editor = vsc.window.activeTextEditor;
+  if (!editor) throw "Attempted to write in non existant editor."
+  editor.edit((qui) => {
+    qui.insert(editor.selection.active, getCommentSign()+strBuild.replaceAll("\n", `\n${getCommentSign()}`));
+  });
+}
+
 export async function commandHandler() {
     if (gbs.emg_cutoff) {
         gbs.msgCutoff(); return;
@@ -21,7 +62,7 @@ export async function commandHandler() {
     const selector = await vsc.window.showOpenDialog({
         title: "Choose picture to upload",
         filters: {
-            "Image": ["bmp"]
+            "Image": ["bmp", "jpg", "png", "jpeg"]
         },
         canSelectFiles: true,
         canSelectFolders: false,
@@ -35,47 +76,8 @@ export async function commandHandler() {
 
     if (gbs.isDebug()) gbs.debugMessage(`[DEBUG] Got file path: "${selector[0].path}".`);
 
-    // Test of parser
-    const imgData = await pictureworks.parseImage(vsc.Uri.file(selector[0].path));
-    const config = gbs.configs();
-    if (!config) throw "Config is null";
-    let tw = config.get<number>("PicWidth");
-    let th = config.get<number>("PicHeight");
-    if (!tw || !th) throw "Config part is null";
-
-    const blockW = imgData.w/tw;
-    const blockH = imgData.h/th;
-
-    let mn = Infinity;
-    let mx = 0;
-    for (let y = 0; y < th; y++) {
-      for (let x = 0; x < tw; x++) {
-        var pxl = imgData.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
-        if (!pxl) continue;
-        const depth = calcDepth(pxl);
-        mx = Math.max(mx, depth);
-        mn = Math.min(mn, depth);
-      }
-    }
-
-    let strBuild: string = "";
-    for (let y = 0; y < th; y++) {
-      for (let x = 0; x < tw; x++) {
-        var pxl = imgData.pixel(Math.floor(x*blockW), Math.floor(y*blockH));
-        if (!pxl) pxl = {r: 0, g: 0, b: 0, a: 0};
-        const depth = calcDepth(pxl);
-        strBuild += signFromDepth(mn, mx, depth);
-      }
-      strBuild+="\n";
-    }
-
-    const editor = vsc.window.activeTextEditor;
-    if (!editor) throw "Attempted to write in non existant editor."
-    editor.edit((qui) => {
-      qui.insert(editor.selection.active, "//"+strBuild.replaceAll("\n", "\n//"));
-    });
+    await placePicture(vsc.Uri.file(selector[0].path));
 }
-
 
 export function asciiOrder(): string {
   const config = gbs.configs()?.get<string>("ASCIILayers");
@@ -90,6 +92,33 @@ export function asciiOrder(): string {
     case '71': return "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
   }
 }
+
+export function getCommentSign(): string|null {
+  //TODO: Make it supproted for more languages or auto detect comment sign
+  const editor = vsc.window.activeTextEditor;
+  if (!editor) return null;
+  let sign = '';
+  if (!gbs.configs()?.get<boolean>("DisableCommentSigns")) {
+    switch (editor.document.languageId) {
+      case 'plain':
+        sign = '';
+        break;
+      case 'lua':
+        sign = '--';
+        break;
+      case "shellscript":
+      case "python":
+        sign = '#';
+        break;
+      default:
+        sign = "//";
+        break;
+    }
+    if (gbs.isDebug()) console.log(`[DECTOX DEBUG] Comment sign for recent operation: ${editor.document.languageId}(${sign})`);
+  }
+  return sign;
+}
+
 
 export function signFromDepth(min: number, max: number, depth: number): string {
   const order = asciiOrder();
