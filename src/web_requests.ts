@@ -1,4 +1,3 @@
-import * as vsc from 'vscode';
 import * as gbs from './globals'
 import type { Browser, Page } from 'puppeteer-core' with { "resolution-mode": "import" };
 
@@ -67,5 +66,9 @@ export async function closeTab(key: string): Promise<boolean> {
  * Deactivates browser functional.
  */
 export async function close() {
+    pages.forEach(async (v, k) => {
+        await closeTab(k);
+    });
     browser.close();
+    available = false;
 }
