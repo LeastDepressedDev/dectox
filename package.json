@@ -31,6 +31,10 @@
         "command": "dectox.grabpics"
       },
       {
+        "title": "Open Image buffer directory",
+        "command": "dectox.reavealBufp"
+      },
+      {
         "title": "Pinterest test command",
         "command": "decctox.pintest"
       }
@@ -105,6 +109,11 @@
             "type": "boolean",
             "description": "Should clear bufp directories from all files when calling Suggestion commands",
             "default": true
+          },
+          "dectox.OpenBufpFolderAfterRequest": {
+            "type": "boolean",
+            "description": "Automatically executes revealFileInOS(open in Explorer) folder after Suggestion request",
+            "default": false
           }
         }
       }

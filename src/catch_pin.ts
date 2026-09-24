@@ -26,6 +26,11 @@ export function getBufpPath(): vsc.Uri {
     return vsc.Uri.joinPath(defp, "bufp");
 }
 
+export async function revealBufp() {
+    const path = getBufpPath();
+    await vsc.commands.executeCommand('revealFileInOS', path);
+}
+
 export async function updatePicturesDirectory() {
     const path = getBufpPath();
 
@@ -45,13 +50,19 @@ export async function commandHandler() {
         title: `Request${result ? '('+result+')' : ''} in progress...`,
         cancellable: true
     }, async (prog, tkn) => {
-        await getPictures(result ? result : " ");
+        await getPictures(result ? result : " ", prog);
         await gbs.sleep(1000); // TODO: Make a proper request finished check
         await updatePicturesDirectory();
     });   
 }
 
-export async function getPictures(query: string) {
+export async function getPictures(query: string, prog?: vsc.Progress<{
+    message?: string;
+    increment?: number;
+}>) {
+
+    if (prog) prog.report({message: "Preparing", increment: 0}); // 0%
+
     const cfg = gbs.configs();
     if (!cfg) throw "Configs are null!";
     const path = getBufpPath();
@@ -71,19 +82,23 @@ export async function getPictures(query: string) {
     const del = cfg.get<number>("RequestDelay");
     if (!del) throw "Failed to get RequestDelat config";
     const uuid = randomUUID();
+
+    if (prog) prog.report({message: "Calling page", increment: 10}); // 10%
+
     const page = await wqr.initTab(stabf(uuid));
-    
     await page.goto(`https://ru.pinterest.com/search/pins/?q=${query}&rs=typed`);
 
     const imagination: Set<string> = new Set();
     const pattern = /(60x60)/;
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 1; i <= 10; i++) {
 
         const result = (await page.$$eval(".iFOUS5", els => {
             return els.map(element => element.src);
         })).filter((element) => !pattern.exec(element));
-        if (gbs.isDebug()) console.log(`Iteration: ${i}: Got ${result.length} pics.`);
+        const message = `Scanning page: Iteration: ${i}: Got ${result.length} pics.`;
+        if (gbs.isDebug()) console.log(message);
+        if (prog) prog.report({message: message, increment: 7}); // 7% each
 
         result.forEach((img) => imagination.add(img));
 
@@ -92,10 +107,11 @@ export async function getPictures(query: string) {
         });
 
         await gbs.sleep(del);
-    }
+    } // 70% final >> 80%
 
     if (gbs.isDebug()) console.log(imagination.size);
 
+    if (prog) prog.report({message: "Downloading pictures", increment: 0}); // 80%
     let i = 0;
     imagination.forEach(img => {
         fetch(img).then((response) => {
@@ -105,6 +121,9 @@ export async function getPictures(query: string) {
         })
     });
 
+    if (prog) prog.report({message: "Clean up", increment: 20}); // 100%
+
     await wqr.closeTab(stabf(uuid));
     vsc.window.showInformationMessage(`Got ${imagination.size} pictures from pinterest.`);
+    if (cfg.get<boolean>("OpenBufpFolderAfterRequest")) await revealBufp();
 }
