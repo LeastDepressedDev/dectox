@@ -137,7 +137,7 @@
         {
           "id": "dectoxBar",
           "title": "DecTox",
-          "icon": "build/assets/icon.svg"
+          "icon": "assets/icon.svg"
         }
       ]
     },
