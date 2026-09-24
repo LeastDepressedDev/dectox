@@ -146,6 +146,8 @@ export function getCommentSign(): string|null {
 /**
  * Obtain an ascii symbol for the specific color.
  * 
+ * Order can be inverted with `dectox.InvertASCIIOrder` setting. 
+ * 
  * @param min minimal depth over the image.
  * @param max maximal depth over the image.
  * @param depth current color's depth calculated via {@link calcDepth}.
@@ -153,5 +155,7 @@ export function getCommentSign(): string|null {
  */
 export function signFromDepth(min: number, max: number, depth: number): string {
   const order = asciiOrder();
-  return order[Math.floor((depth-min)/(max-min)*(order.length-1))];
+  const invert = gbs.configs()?.get<string>("InvertASCIIOrder");
+  const index = Math.floor((depth-min)/(max-min)*(order.length-1));
+  return order[invert ? order.length-1-index : index];
 }

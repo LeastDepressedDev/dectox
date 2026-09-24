@@ -115,7 +115,7 @@ export async function getPictures(query: string, prog?: vsc.Progress<{
     }
 
     const del = cfg.get<number>("RequestDelay");
-    if (!del) throw "Failed to get RequestDelat config";
+    if (!del) throw "Failed to get RequestDelay config";
     const uuid = randomUUID();
 
     if (prog) prog.report({message: "Calling page", increment: 10}); // 10%

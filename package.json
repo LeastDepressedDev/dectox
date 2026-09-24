@@ -84,6 +84,11 @@
             ],
             "default": "14"
           },
+          "dectox.InvertASCIIOrder": {
+            "type": "boolean",
+            "description": "Inverts ascii order",
+            "default": "true"
+          },
           "dectox.PicWidth": {
             "type": "integer",
             "description": "Width of ascii picture.",
