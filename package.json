@@ -19,7 +19,11 @@
   "contributes": {
     "commands": [
       {
-        "title": "Place picture",
+        "title": "Choose picture to place picture",
+        "command": "dectox.ChoosePlacePicture"
+      },
+      {
+        "title": "Place",
         "command": "dectox.PlacePic"
       },
       {
@@ -33,6 +37,10 @@
       {
         "title": "Open Image buffer directory",
         "command": "dectox.reavealBufp"
+      },
+      {
+        "title": "Refresh",
+        "command": "dectox.refreshViewBufp"
       },
       {
         "title": "Pinterest test command",
@@ -120,7 +128,7 @@
     ],
     "keybindings": [
       {
-        "command": "dectox.PlacePic",
+        "command": "dectox.ChoosePlacePicture",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l",
         "when": "editorTextFocus"
@@ -131,7 +139,52 @@
         "mac": "cmd+right",
         "when": "editorTextFocus"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dectoxBar",
+          "title": "DecTox",
+          "icon": "assets/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "dectoxBar": [
+        {
+          "id": "dectoxGeneral",
+          "name": "General",
+          "type": "tree",
+          "icon": ""
+        },
+        {
+          "id": "dectoxBufp",
+          "name": "Buffer folder view",
+          "type": "tree",
+          "icon": ""
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "dectox.refreshViewBufp",
+          "group": "navigation",
+          "when": "view == dectoxBufp"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dectox.PlacePic",
+          "group": "inline",
+          "when": "view == dectoxBufp && viewItem == dectoxImgtp"
+        },
+        {
+          "command": "dectox.PlacePic",
+          "when": "view == dectoxBufp && viewItem == dectoxImgtp"
+        }
+      ]
+    }
   },
   "scripts": {
     "compile": "tsc -p ./"

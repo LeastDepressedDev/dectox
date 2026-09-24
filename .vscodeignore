@@ -3,4 +3,5 @@
 
 !node_modules
 !LICENSE
-!build/*
+!build/**
+!assets/**
