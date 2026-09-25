@@ -160,13 +160,13 @@
           "id": "dectoxGeneral",
           "name": "General",
           "type": "tree",
-          "icon": ""
+          "icon": "assets/icon.svg"
         },
         {
           "id": "dectoxBufp",
           "name": "Buffer folder view",
           "type": "tree",
-          "icon": ""
+          "icon": "assets/icon.svg"
         }
       ]
     },
