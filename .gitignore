@@ -1,6 +1,7 @@
 .vscode
 /build
 /node_modules
+/docs
 *.vsix
 package-lock.json
 *.bmp
