@@ -10,5 +10,5 @@ if [[ ! $1 = 'offline' ]]; then
 fi
 
 npm run compile --verbose
-vsce package --allow-star-activation --readme-path src/README.md
 npx typedoc src/** --skipErrorChecking --readme README.md
+vsce package --allow-star-activation --readme-path src/README.md
